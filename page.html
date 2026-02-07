@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Surprise ❤️</title>
+    <style>
+        /* --- 1. CORE STYLES --- */
+        body {
+            background-color: #ffc0cb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Horizontal scroll band */
+        }
+
+        /* --- 2. FALLING PETALS ANIMATION (Feature B) --- */
+        .petal {
+            position: fixed;
+            top: -10%;
+            z-index: 9999;
+            user-select: none;
+            pointer-events: none;
+            animation-name: fall;
+            animation-timing-function: linear;
+        }
+
+        @keyframes fall {
+            0% { top: -10%; transform: translateX(0) rotate(0deg); opacity: 1; }
+            100% { top: 110%; transform: translateX(100px) rotate(360deg); opacity: 0; }
+        }
+
+        /* --- 3. INTRO SCREEN (Feature C) --- */
+        #intro-screen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .name-box {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            border: 4px solid #ff4d6d;
+            max-width: 90%;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #ffc0cb;
+            border-radius: 10px;
+            outline: none;
+            width: 80%;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #d63384;
+        }
+
+        .enter-btn {
+            background: #ff4d6d;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
+        }
+
+        .enter-btn:hover { transform: scale(1.05); background: #d63384; }
+
+        /* --- 4. MAIN SITE LAYOUT --- */
+        h1 {
+            color: #d63384;
+            margin-top: 30px;
+            font-size: 2.2rem;
+            text-shadow: 2px 2px white;
+            z-index: 10; position: relative;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 30px;
+            padding: 40px;
+            max-width: 1000px;
+            margin: auto;
+            position: relative; z-index: 10;
+        }
+
+        .gift-box {
+            position: relative;
+            background: #ff4d6d;
+            height: 160px;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 10px 0 #a41636, 0 15px 20px rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border: 2px solid #fff;
+        }
+        .gift-box:active { transform: translateY(10px); box-shadow: 0 0 0 #a41636; }
+
+        .ribbon-vertical { position: absolute; width: 25px; height: 100%; background: #fff0f3; left: 50%; transform: translateX(-50%); }
+        .ribbon-horizontal { position: absolute; height: 25px; width: 100%; background: #fff0f3; top: 50%; transform: translateY(-50%); }
+        
+        .box-label { z-index: 2; background: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; color: #d63384; font-size: 14px; text-transform: uppercase; }
+        .date-label { z-index: 2; margin-top: 5px; color: white; font-weight: bold; font-size: 12px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
+        /* --- 5. OVERLAY CONTENT --- */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(255, 192, 203, 0.98);
+            z-index: 100;
+            overflow-y: auto;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .content-card {
+            background: white;
+            width: 85%;
+            max-width: 500px;
+            margin: 40px auto;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+            border: 4px solid #ff4d6d;
+        }
+        .close-btn { float: right; font-size: 30px; cursor: pointer; color: #ff4d6d; }
+        .content-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; border: 2px solid #ffc0cb; margin-bottom: 15px;}
+        .content-text { font-size: 17px; color: #555; line-height: 1.6; text-align: left; padding: 10px; font-weight: 500; }
+        
+        /* --- 6. MUSIC CONTROL BUTTON (Feature A) --- */
+        #music-control {
+            position: fixed;
+            bottom: 20px; right: 20px;
+            background: white;
+            border-radius: 50%;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            cursor: pointer;
+            z-index: 20000;
+            font-size: 24px;
+            display: none; /* Intro ke baad dikhega */
+            border: 2px solid #ff4d6d;
+        }
+
+    </style>
+</head>
+<body>
+
+    <audio id="bg-music" loop>
+        <source src="song.mp3" type="audio/mpeg">
+        Your browser does not support audio.
+    </audio>
+
+    <div id="intro-screen">
+        <div class="name-box">
+            <h2 style="color: #ff4d6d;">Welcome to Love World ❤️</h2>
+            <p style="color: #888;">Please enter your name to unlock:</p>
+            <input type="text" id="partnerName" placeholder="Enter Name Here...">
+            <br>
+            <button class="enter-btn" onclick="startJourney()">Open My Heart 💖</button>
+        </div>
+    </div>
+
+    <div id="main-site" style="display:none;"> <h1 id="main-heading">Happy Valentine's Week! 💖</h1>
+
+        <div class="container" id="boxContainer">
+            </div>
+    </div>
+
+    <div id="fullPageOverlay" class="overlay">
+        <div class="content-card">
+            <span class="close-btn" onclick="closePage()">&times;</span>
+            <h2 id="pageTitle" style="color: #d63384;">Title</h2>
+            <img id="pageImage" class="content-img" src="" alt="Image">
+            <p id="pageText" class="content-text"></p>
+            <div id="pageGif"></div>
+        </div>
+    </div>
+
+    <div id="music-control" onclick="toggleMusic()">🎵</div>
+
+    <script>
+        let userName = "My Love"; // Default name
+
+        // --- DATA SECTION ---
+        const weekData = [
+            { id: 1, date: "7 Feb", title: "Rose Day 🌹", image: "day1.jpeg", gif: "https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif", text: "Happy Rose Day [Name]! Ye gulaab sirf ek phool nahi, ye mere pyaar ka izhaar hai jo hamesha tumhare liye taaza rahega." },
+            { id: 2, date: "8 Feb", title: "Propose Day 💍", image: "day2.jpeg", gif: "https://media.giphy.com/media/l4pTfx2qLszoacZRS/giphy.gif", text: "Dil ki baat aaj kehna chahta hoon, tera haath umar bhar thamna chahta hoon. Will you be mine forever, [Name]?" },
+            { id: 3, date: "9 Feb", title: "Chocolate Day 🍫", image: "day3.jpeg", gif: "https://media.giphy.com/media/d2Z88bJ1e3k6k/giphy.gif", text: "Chocolate se bhi zyada sweet ho tum [Name]. Zindagi me mithas bas tumse hi hai. Happy Chocolate Day!" },
+            { id: 4, date: "10 Feb", title: "Teddy Day 🧸", image: "day4.jpeg", gif: "https://media.giphy.com/media/26xBwdIuRJiImLV6w/giphy.gif", text: "Ek pyara sa Teddy us insaan ke liye jo khud ek Teddy se kam nahi. Love you my cutie [Name]!" },
+            { id: 5, date: "11 Feb", title: "Promise Day 🤝", image: "day5.jpeg", gif: "https://media.giphy.com/media/3o7TKoWXm3okO1kgHC/giphy.gif", text: "Wada raha, har dukh me main tumhare aage rahunga. Happy Promise Day [Name]!" },
+            { id: 6, date: "12 Feb", title: "Hug Day 🤗", image: "day6.jpeg", gif: "https://media.giphy.com/media/l8ooOxhcItoww/giphy.gif", text: "Tumhari ek jadoo ki jhappi saare gham bhula deti hai. Sending you a big tight hug [Name]!" },
+            { id: 7, date: "13 Feb", title: "Kiss Day 💋", image: "day7.jpeg", gif: "https://media.giphy.com/media/NyGFmz59xGfWU/giphy.gif", text: "Hawaon me pyaar hai, aur mere honthon pe tumhara naam. Happy Kiss Day [Name]!" },
+            { id: 8, date: "14 Feb", title: "Valentine's Day ❤️", image: "day8.jpeg", gif: "https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif", text: "Happy Valentine's Day [Name]! Tum meri duniya ho. I Love You so much! ❤️" }
+        ];
+
+        // --- FEATURE C: START JOURNEY & SAVE NAME ---
+        function startJourney() {
+            const inputName = document.getElementById('partnerName').value;
+            if (inputName.trim() !== "") {
+                userName = inputName;
+            }
+
+            // 1. Hide Intro, Show Main Site
+            document.getElementById('intro-screen').style.display = 'none';
+            document.getElementById('main-site').style.display = 'block';
+            document.getElementById('music-control').style.display = 'block';
+
+            // 2. Update Heading with Name
+            document.getElementById('main-heading').innerText = `Happy Valentine's Week, ${userName}! 💖`;
+
+            // 3. Start Music (Feature A)
+            const audio = document.getElementById('bg-music');
+            audio.volume = 0.5; // 50% volume
+            audio.play().catch(error => console.log("Autoplay blocked, user interaction needed"));
+
+            // 4. Start Falling Petals (Feature B)
+            setInterval(createPetal, 300); // Har 300ms me ek petal girega
+        }
+
+        // --- FEATURE B: FALLING PETALS LOGIC ---
+        function createPetal() {
+            const petal = document.createElement('div');
+            petal.classList.add('petal');
+            petal.innerText = Math.random() > 0.5 ? '🌸' : '🌹'; // Random flower
+            
+            // Random position and animation duration
+            petal.style.left = Math.random() * 100 + 'vw';
+            petal.style.animationDuration = Math.random() * 3 + 2 + 's'; // 2s to 5s
+            petal.style.fontSize = Math.random() * 20 + 20 + 'px'; // Random size
+            
+            document.body.appendChild(petal);
+
+            // Remove petal after animation ends to prevent memory leak
+            setTimeout(() => {
+                petal.remove();
+            }, 5000);
+        }
+
+        // --- FEATURE A: MUSIC TOGGLE ---
+        function toggleMusic() {
+            const audio = document.getElementById('bg-music');
+            const btn = document.getElementById('music-control');
+            if (audio.paused) {
+                audio.play();
+                btn.innerText = "🎵"; // Playing icon
+            } else {
+                audio.pause();
+                btn.innerText = "🔇"; // Muted icon
+            }
+        }
+
+        // --- RENDER BOXES ---
+        const container = document.getElementById('boxContainer');
+        weekData.forEach(item => {
+            const box = document.createElement('div');
+            box.className = 'gift-box';
+            box.onclick = () => openPage(item);
+            box.innerHTML = `
+                <div class="ribbon-vertical"></div>
+                <div class="ribbon-horizontal"></div>
+                <div class="box-label">${item.title}</div>
+                <div class="date-label">${item.date}</div>
+            `;
+            container.appendChild(box);
+        });
+
+        // --- OPEN PAGE & INJECT NAME ---
+        function openPage(data) {
+            document.getElementById('pageTitle').innerText = data.title;
+            document.getElementById('pageImage').src = data.image;
+            document.getElementById('pageGif').innerHTML = `<img src="${data.gif}" width="150" style="border-radius:10px;">`;
+            
+            // Replace [Name] placeholder with actual user name
+            const personalizedText = data.text.replace("[Name]", userName);
+            document.getElementById('pageText').innerText = personalizedText;
+            
+            document.getElementById('fullPageOverlay').style.display = 'block';
+        }
+
+        function closePage() {
+            document.getElementById('fullPageOverlay').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
