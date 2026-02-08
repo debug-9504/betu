@@ -12,10 +12,10 @@
             text-align: center;
             margin: 0;
             padding: 0;
-            overflow-x: hidden; /* Horizontal scroll band */
+            overflow-x: hidden;
         }
 
-        /* --- 2. FALLING PETALS ANIMATION (Feature B) --- */
+        /* --- 2. FALLING PETALS ANIMATION --- */
         .petal {
             position: fixed;
             top: -10%;
@@ -31,7 +31,7 @@
             100% { top: 110%; transform: translateX(100px) rotate(360deg); opacity: 0; }
         }
 
-        /* --- 3. INTRO SCREEN (Feature C) --- */
+        /* --- 3. INTRO SCREEN --- */
         #intro-screen {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -79,6 +79,15 @@
 
         .enter-btn:hover { transform: scale(1.05); background: #d63384; }
 
+        /* Error Message Style */
+        #error-msg {
+            color: red;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 18px;
+            min-height: 25px; /* Space reserved */
+        }
+
         /* --- 4. MAIN SITE LAYOUT --- */
         h1 {
             color: #d63384;
@@ -114,11 +123,21 @@
         }
         .gift-box:active { transform: translateY(10px); box-shadow: 0 0 0 #a41636; }
 
+        /* Locked State CSS */
+        .gift-box.locked {
+            background: #555;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+            opacity: 0.8;
+        }
+        .gift-box.locked:active { transform: none; box-shadow: 0 10px 0 #333; }
+
         .ribbon-vertical { position: absolute; width: 25px; height: 100%; background: #fff0f3; left: 50%; transform: translateX(-50%); }
         .ribbon-horizontal { position: absolute; height: 25px; width: 100%; background: #fff0f3; top: 50%; transform: translateY(-50%); }
         
         .box-label { z-index: 2; background: white; padding: 5px 15px; border-radius: 20px; font-weight: bold; color: #d63384; font-size: 14px; text-transform: uppercase; }
         .date-label { z-index: 2; margin-top: 5px; color: white; font-weight: bold; font-size: 12px; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+        .lock-icon { font-size: 40px; margin-bottom: 10px; z-index: 5; color: white; }
 
         /* --- 5. OVERLAY CONTENT --- */
         .overlay {
@@ -148,7 +167,7 @@
         .content-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; border: 2px solid #ffc0cb; margin-bottom: 15px;}
         .content-text { font-size: 17px; color: #555; line-height: 1.6; text-align: left; padding: 10px; font-weight: 500; }
         
-        /* --- 6. MUSIC CONTROL BUTTON (Feature A) --- */
+        /* --- 6. MUSIC CONTROL BUTTON --- */
         #music-control {
             position: fixed;
             bottom: 20px; right: 20px;
@@ -159,7 +178,7 @@
             cursor: pointer;
             z-index: 20000;
             font-size: 24px;
-            display: none; /* Intro ke baad dikhega */
+            display: none;
             border: 2px solid #ff4d6d;
         }
 
@@ -175,15 +194,17 @@
     <div id="intro-screen">
         <div class="name-box">
             <h2 style="color: #ff4d6d;">Welcome to Love World ❤️</h2>
-            <p style="color: #888;">Please enter your name to unlock:</p>
+            <p style="color: #888;">Enter Name (Hint: My Heartbeat):</p>
             <input type="text" id="partnerName" placeholder="Enter Name Here...">
             <br>
             <button class="enter-btn" onclick="startJourney()">Open My Heart 💖</button>
+            
+            <p id="error-msg"></p>
         </div>
     </div>
 
-    <div id="main-site" style="display:none;"> <h1 id="main-heading">Happy Valentine's Week! 💖</h1>
-
+    <div id="main-site" style="display:none;"> 
+        <h1 id="main-heading">Happy Valentine's Week! 💖</h1>
         <div class="container" id="boxContainer">
             </div>
     </div>
@@ -201,101 +222,123 @@
     <div id="music-control" onclick="toggleMusic()">🎵</div>
 
     <script>
-        let userName = "My Love"; // Default name
+        let userName = "Pihu"; 
 
-        // --- DATA SECTION ---
+        // --- CONFIGURATION ---
         const weekData = [
-            { id: 1, date: "7 Feb", title: "Rose Day 🌹", image: "day1.jpeg", gif: "https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif", text: "Happy Rose Day [Name]! Ye gulaab sirf ek phool nahi, ye mere pyaar ka izhaar hai jo hamesha tumhare liye taaza rahega." },
-            { id: 2, date: "8 Feb", title: "Propose Day 💍", image: "day2.jpeg", gif: "https://media.giphy.com/media/l4pTfx2qLszoacZRS/giphy.gif", text: "Dil ki baat aaj kehna chahta hoon, tera haath umar bhar thamna chahta hoon. Will you be mine forever, [Name]?" },
-            { id: 3, date: "9 Feb", title: "Chocolate Day 🍫", image: "day3.jpeg", gif: "https://media.giphy.com/media/d2Z88bJ1e3k6k/giphy.gif", text: "Chocolate se bhi zyada sweet ho tum [Name]. Zindagi me mithas bas tumse hi hai. Happy Chocolate Day!" },
-            { id: 4, date: "10 Feb", title: "Teddy Day 🧸", image: "day4.jpeg", gif: "https://media.giphy.com/media/26xBwdIuRJiImLV6w/giphy.gif", text: "Ek pyara sa Teddy us insaan ke liye jo khud ek Teddy se kam nahi. Love you my cutie [Name]!" },
-            { id: 5, date: "11 Feb", title: "Promise Day 🤝", image: "day5.jpeg", gif: "https://media.giphy.com/media/3o7TKoWXm3okO1kgHC/giphy.gif", text: "Wada raha, har dukh me main tumhare aage rahunga. Happy Promise Day [Name]!" },
-            { id: 6, date: "12 Feb", title: "Hug Day 🤗", image: "day6.jpeg", gif: "https://media.giphy.com/media/l8ooOxhcItoww/giphy.gif", text: "Tumhari ek jadoo ki jhappi saare gham bhula deti hai. Sending you a big tight hug [Name]!" },
-            { id: 7, date: "13 Feb", title: "Kiss Day 💋", image: "day7.jpeg", gif: "https://media.giphy.com/media/NyGFmz59xGfWU/giphy.gif", text: "Hawaon me pyaar hai, aur mere honthon pe tumhara naam. Happy Kiss Day [Name]!" },
-            { id: 8, date: "14 Feb", title: "Valentine's Day ❤️", image: "day8.jpeg", gif: "https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif", text: "Happy Valentine's Day [Name]! Tum meri duniya ho. I Love You so much! ❤️" }
+            { id: 1, unlockDay: 7, date: "7 Feb", title: "Rose Day 🌹", image: "day1.jpeg", gif: "https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif", text: "Happy Rose Day [Name]! Ye gulaab sirf ek phool nahi, ye mere pyaar ka izhaar hai jo hamesha tumhare liye taaza rahega." },
+            { id: 2, unlockDay: 8, date: "8 Feb", title: "Propose Day 💍", image: "day2.jpeg", gif: "https://media.giphy.com/media/l4pTfx2qLszoacZRS/giphy.gif", text: "Dil ki baat aaj kehna chahta hoon, tera haath umar bhar thamna chahta hoon. Will you be mine forever, [Name]?" },
+            { id: 3, unlockDay: 9, date: "9 Feb", title: "Chocolate Day 🍫", image: "day3.jpeg", gif: "https://media.giphy.com/media/d2Z88bJ1e3k6k/giphy.gif", text: "Chocolate se bhi zyada sweet ho tum [Name]. Zindagi me mithas bas tumse hi hai. Happy Chocolate Day!" },
+            { id: 4, unlockDay: 10, date: "10 Feb", title: "Teddy Day 🧸", image: "day4.jpeg", gif: "https://media.giphy.com/media/26xBwdIuRJiImLV6w/giphy.gif", text: "Ek pyara sa Teddy us insaan ke liye jo khud ek Teddy se kam nahi. Love you my cutie [Name]!" },
+            { id: 5, unlockDay: 11, date: "11 Feb", title: "Promise Day 🤝", image: "day5.jpeg", gif: "https://media.giphy.com/media/3o7TKoWXm3okO1kgHC/giphy.gif", text: "Wada raha, har dukh me main tumhare aage rahunga. Happy Promise Day [Name]!" },
+            { id: 6, unlockDay: 12, date: "12 Feb", title: "Hug Day 🤗", image: "day6.jpeg", gif: "https://media.giphy.com/media/l8ooOxhcItoww/giphy.gif", text: "Tumhari ek jadoo ki jhappi saare gham bhula deti hai. Sending you a big tight hug [Name]!" },
+            { id: 7, unlockDay: 13, date: "13 Feb", title: "Kiss Day 💋", image: "day7.jpeg", gif: "https://media.giphy.com/media/NyGFmz59xGfWU/giphy.gif", text: "Hawaon me pyaar hai, aur mere honthon pe tumhara naam. Happy Kiss Day [Name]!" },
+            { id: 8, unlockDay: 14, date: "14 Feb", title: "Valentine's Day ❤️", image: "day8.jpeg", gif: "https://media.giphy.com/media/26BRv0ThflsHCqDrG/giphy.gif", text: "Happy Valentine's Day [Name]! Tum meri duniya ho. I Love You so much! ❤️" }
         ];
 
-        // --- FEATURE C: START JOURNEY & SAVE NAME ---
+        // --- FEATURE C: START JOURNEY & NAME CHECK ---
         function startJourney() {
-            const inputName = document.getElementById('partnerName').value;
-            if (inputName.trim() !== "") {
-                userName = inputName;
+            const inputField = document.getElementById('partnerName');
+            const errorMsg = document.getElementById('error-msg');
+            
+            // Naam me se extra space hatana aur chota-bada letter ignore karna
+            const inputName = inputField.value.trim();
+            const checkName = inputName.toLowerCase();
+
+            // Check karo agar naam khali hai
+            if (inputName === "") {
+                errorMsg.innerText = "Please enter a name!";
+                return;
             }
 
-            // 1. Hide Intro, Show Main Site
-            document.getElementById('intro-screen').style.display = 'none';
-            document.getElementById('main-site').style.display = 'block';
-            document.getElementById('music-control').style.display = 'block';
+            // CHECK: KYA NAAM PIHU HAI?
+            if (checkName === "pihu") {
+                // Sahi Naam: Site kholo
+                userName = "Pihu";
+                document.getElementById('intro-screen').style.display = 'none';
+                document.getElementById('main-site').style.display = 'block';
+                document.getElementById('music-control').style.display = 'block';
+                document.getElementById('main-heading').innerText = `Happy Valentine's Week, ${userName}! 💖`;
 
-            // 2. Update Heading with Name
-            document.getElementById('main-heading').innerText = `Happy Valentine's Week, ${userName}! 💖`;
+                const audio = document.getElementById('bg-music');
+                audio.volume = 0.5;
+                audio.play().catch(error => console.log("User interaction needed for audio"));
 
-            // 3. Start Music (Feature A)
-            const audio = document.getElementById('bg-music');
-            audio.volume = 0.5; // 50% volume
-            audio.play().catch(error => console.log("Autoplay blocked, user interaction needed"));
+                setInterval(createPetal, 300);
+                renderBoxes();
 
-            // 4. Start Falling Petals (Feature B)
-            setInterval(createPetal, 300); // Har 300ms me ek petal girega
+            } else {
+                // Galat Naam: Button ke niche message dikhao
+                errorMsg.innerText = `Sagar k dil m "${inputName}" name ki koi ladki nahi h.`;
+                
+                // Animation effect (shake) for wrong input
+                inputField.style.border = "2px solid red";
+                setTimeout(() => { inputField.style.border = "2px solid #ffc0cb"; }, 2000);
+            }
         }
 
-        // --- FEATURE B: FALLING PETALS LOGIC ---
+        // --- RENDER BOXES WITH DATE LOCK ---
+        function renderBoxes() {
+            const container = document.getElementById('boxContainer');
+            container.innerHTML = "";
+            
+            const today = new Date();
+            const currentDay = today.getDate(); // e.g., 9
+            
+            // Testing ke liye isse uncomment karein:
+            // const currentDay = 8; 
+
+            weekData.forEach(item => {
+                const box = document.createElement('div');
+                box.className = 'gift-box';
+                
+                const isLocked = item.unlockDay > currentDay;
+
+                if(isLocked) {
+                    box.classList.add('locked');
+                    box.onclick = () => alert(`Sabar ka phal meetha hota hai! 😜\nYe gift ${item.date} ko khulega!`);
+                    box.innerHTML = `
+                        <div class="lock-icon">🔒</div>
+                        <div class="box-label" style="background:#ddd; color:#888;">Locked</div>
+                        <div class="date-label">${item.date}</div>
+                    `;
+                } else {
+                    box.onclick = () => openPage(item);
+                    box.innerHTML = `
+                        <div class="ribbon-vertical"></div>
+                        <div class="ribbon-horizontal"></div>
+                        <div class="box-label">${item.title}</div>
+                        <div class="date-label">${item.date}</div>
+                    `;
+                }
+                container.appendChild(box);
+            });
+        }
+
+        // --- EXTRA FUNCTIONS ---
         function createPetal() {
             const petal = document.createElement('div');
             petal.classList.add('petal');
-            petal.innerText = Math.random() > 0.5 ? '🌸' : '🌹'; // Random flower
-            
-            // Random position and animation duration
+            petal.innerText = Math.random() > 0.5 ? '🌸' : '🌹';
             petal.style.left = Math.random() * 100 + 'vw';
-            petal.style.animationDuration = Math.random() * 3 + 2 + 's'; // 2s to 5s
-            petal.style.fontSize = Math.random() * 20 + 20 + 'px'; // Random size
-            
+            petal.style.animationDuration = Math.random() * 3 + 2 + 's';
+            petal.style.fontSize = Math.random() * 20 + 20 + 'px';
             document.body.appendChild(petal);
-
-            // Remove petal after animation ends to prevent memory leak
-            setTimeout(() => {
-                petal.remove();
-            }, 5000);
+            setTimeout(() => { petal.remove(); }, 5000);
         }
 
-        // --- FEATURE A: MUSIC TOGGLE ---
         function toggleMusic() {
             const audio = document.getElementById('bg-music');
             const btn = document.getElementById('music-control');
-            if (audio.paused) {
-                audio.play();
-                btn.innerText = "🎵"; // Playing icon
-            } else {
-                audio.pause();
-                btn.innerText = "🔇"; // Muted icon
-            }
+            if (audio.paused) { audio.play(); btn.innerText = "🎵"; } 
+            else { audio.pause(); btn.innerText = "🔇"; }
         }
 
-        // --- RENDER BOXES ---
-        const container = document.getElementById('boxContainer');
-        weekData.forEach(item => {
-            const box = document.createElement('div');
-            box.className = 'gift-box';
-            box.onclick = () => openPage(item);
-            box.innerHTML = `
-                <div class="ribbon-vertical"></div>
-                <div class="ribbon-horizontal"></div>
-                <div class="box-label">${item.title}</div>
-                <div class="date-label">${item.date}</div>
-            `;
-            container.appendChild(box);
-        });
-
-        // --- OPEN PAGE & INJECT NAME ---
         function openPage(data) {
             document.getElementById('pageTitle').innerText = data.title;
             document.getElementById('pageImage').src = data.image;
             document.getElementById('pageGif').innerHTML = `<img src="${data.gif}" width="150" style="border-radius:10px;">`;
-            
-            // Replace [Name] placeholder with actual user name
-            const personalizedText = data.text.replace("[Name]", userName);
-            document.getElementById('pageText').innerText = personalizedText;
-            
+            document.getElementById('pageText').innerText = data.text.replace("[Name]", userName);
             document.getElementById('fullPageOverlay').style.display = 'block';
         }
 
